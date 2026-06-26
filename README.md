@@ -151,6 +151,61 @@ print(response.choices[0].message.content)
 
 ---
 
+## 🐘 Anthropic API Format Support
+
+Your proxy also supports the **Anthropic Messages API format**! This means you can use `@anthropic-ai/sdk` or any tool that speaks Anthropic's native API.
+
+**Endpoint:** `https://ai-proxy.YOUR-USERNAME.workers.dev/anthropic/`
+**Auth:** Same `Authorization: Bearer` token as OpenAI format
+
+### Python + Anthropic SDK:
+```python
+from anthropic import Anthropic
+
+client = Anthropic(
+    # Your proxy URL + /anthropic
+    base_url="https://ai-proxy.YOUR-USERNAME.workers.dev/anthropic",
+    # Use your PROXY_AUTH_TOKEN as the API key
+    api_key="my-secret-password-123"
+)
+
+message = client.messages.create(
+    model="deep-think",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Hello, Claude!"}]
+)
+print(message.content[0].text)
+```
+
+### With curl (non-streaming):
+```bash
+curl -X POST https://ai-proxy.YOUR-USERNAME.workers.dev/anthropic/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer my-secret-password-123" \
+  -d '{
+    "model": "deep-think",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### With curl (streaming):
+```bash
+curl -N -X POST https://ai-proxy.YOUR-USERNAME.workers.dev/anthropic/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer my-secret-password-123" \
+  -d '{
+    "model": "deep-think",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Count to 5"}],
+    "stream": true
+  }'
+```
+
+> **How it works**: When you send an Anthropic-format request to a model using an `anthropic` or `anthropic-compatible` provider, the proxy forwards the request natively without any format conversion — preserving all Anthropic-specific features (system messages, content blocks, tool use, streaming events). If the model uses a different provider (e.g., `openai` or `google`), the proxy automatically converts between formats.
+
+---
+
 ## 🔧 Adding a New API Provider (Manual)
 
 If you want to add a third-party API provider that's not in the default configuration, you can do it entirely through configuration — no coding needed, as long as the provider speaks OpenAI or Anthropic compatible protocol.

@@ -117,6 +117,8 @@ export interface Env {
 export interface ProviderResponse {
   success: boolean;
   response?: OpenAIChatResponse;
+  /** Anthropic-native raw response (used by nativeChat path) */
+  rawResponse?: unknown;
   stream?: ReadableStream<Uint8Array>;
   error?: string;
   statusCode?: number;
