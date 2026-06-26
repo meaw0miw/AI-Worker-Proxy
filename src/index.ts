@@ -254,11 +254,18 @@ function json(data: unknown, status = 200): Response {
 }
 
 function verifyAuth(request: Request, env: Env): boolean {
+  // OpenAI-style: Authorization: Bearer <token>
   const authHeader = request.headers.get('Authorization');
-  if (!authHeader) return false;
+  if (authHeader) {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+    if (token === env.PROXY_AUTH_TOKEN) return true;
+  }
 
-  const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
-  return token === env.PROXY_AUTH_TOKEN;
+  // Anthropic-style: x-api-key: <token>
+  const apiKey = request.headers.get('x-api-key');
+  if (apiKey && apiKey === env.PROXY_AUTH_TOKEN) return true;
+
+  return false;
 }
 
 function resolveApiKeys(config: ProviderConfig, env: Env): string[] {
