@@ -40,9 +40,7 @@ export class TokenManager {
 
         // If response failed but it's retryable, try next key
         lastError = response.error;
-        console.log(
-          `[TokenManager] Failed with key ${i + 1}/${apiKeys.length}: ${response.error}`
-        );
+        console.log(`[TokenManager] Failed with key ${i + 1}/${apiKeys.length}: ${response.error}`);
 
         // If it's not a retryable error, don't try other keys for this provider
         if (response.statusCode && !this.isRetryableStatusCode(response.statusCode)) {
