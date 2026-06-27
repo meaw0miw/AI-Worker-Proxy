@@ -98,7 +98,7 @@ async function handleChatCompletion(request: Request, env: Env): Promise<Respons
   console.log(`[Worker] model=${chatRequest.model} stream=${chatRequest.stream || false}`);
 
   const router = new Router(env);
-  const response = await router.executeWithFallback(chatRequest);
+  const response = await router.executeWithFallback(chatRequest, 'openai');
 
   if (!response.success) {
     throw new ProxyError(response.error || 'All providers failed', response.statusCode || 500);
@@ -220,7 +220,7 @@ async function handleAnthropicConversionPath(
 ): Promise<Response> {
   const openaiRequest = convertAnthropicRequestToOpenAI(body);
 
-  const response = await router.executeWithFallback(openaiRequest);
+  const response = await router.executeWithFallback(openaiRequest, 'anthropic');
 
   if (!response.success) {
     throw new ProxyError(response.error || 'All providers failed', response.statusCode || 500);
